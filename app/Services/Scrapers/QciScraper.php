@@ -64,6 +64,8 @@ class QciScraper
                         
                         if ($isNewPost) {
                             $newPostsCount++;
+                            // Classify the new post
+                            $this->classifyPost($postData, $company);
                         }
                     }
                 } catch (\Exception $e) {
@@ -74,23 +76,11 @@ class QciScraper
 
             $company->update(['last_scraped_at' => now()]);
             
+            // Mark all new posts as notified (notifications now handled by classification)
             if ($newPostsCount > 0) {
-                $unnotifiedPosts = $company->posts()
+                $company->posts()
                     ->whereNull('user_notified_at')
-                    ->orderBy('published_at', 'desc')
-                    ->get();
-
-                if ($unnotifiedPosts->count() === 1) {
-                    $post = $unnotifiedPosts->first();
-                    $post->load('company'); // Ensure company relationship is loaded
-                    $this->telegramService->sendNewPostNotification($post);
-                    $post->update(['user_notified_at' => now()]);
-                } else {
-                    $this->telegramService->sendMultiplePostsNotification($company, $unnotifiedPosts->count());
-                    $company->posts()
-                        ->whereNull('user_notified_at')
-                        ->update(['user_notified_at' => now()]);
-                }
+                    ->update(['user_notified_at' => now()]);
             }
             
             Log::info("QCI scraping completed. Scraped {$scrapedCount} posts, {$newPostsCount} new.");
@@ -243,5 +233,21 @@ class QciScraper
         );
 
         return $isNewPost;
+    }
+
+    private function classifyPost(array $postData, Company $company): void
+    {
+        try {
+            $post = Post::where('company_id', $company->id)
+                ->where('external_id', $postData['external_id'])
+                ->first();
+
+            if ($post && !$post->isClassified()) {
+                $post->classify();
+                Log::info("Post classified for {$company->name}: {$post->title}");
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to classify post for {$company->name}: " . $e->getMessage());
+        }
     }
 }

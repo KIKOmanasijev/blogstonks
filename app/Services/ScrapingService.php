@@ -7,6 +7,8 @@ use App\Services\Scrapers\IonqScraper;
 use App\Services\Scrapers\DwaveScraper;
 use App\Services\Scrapers\TeslaScraper;
 use App\Services\Scrapers\QciScraper;
+use App\Services\Scrapers\RigettiScraper;
+use App\Services\Scrapers\IntelScraper;
 use App\Services\ProxyService;
 use Illuminate\Support\Facades\Log;
 
@@ -17,6 +19,8 @@ class ScrapingService
         'dwave' => DwaveScraper::class,
         'tesla' => TeslaScraper::class,
         'qci' => QciScraper::class,
+        'rigetti' => RigettiScraper::class,
+        'intel' => IntelScraper::class,
     ];
 
     protected TelegramNotificationService $telegramService;
@@ -80,6 +84,14 @@ class ScrapingService
         
         if (str_contains($url, 'quantumcomputinginc.com') || str_contains($name, 'quantum computing inc')) {
             return $this->scrapers['qci'];
+        }
+        
+        if (str_contains($url, 'rigetti.com') || str_contains($name, 'rigetti')) {
+            return $this->scrapers['rigetti'];
+        }
+        
+        if (str_contains($url, 'intel.com') || str_contains($name, 'intel')) {
+            return $this->scrapers['intel'];
         }
         
         return null;

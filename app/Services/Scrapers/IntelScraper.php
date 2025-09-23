@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
-class IonqScraper
+class IntelScraper
 {
     protected TelegramNotificationService $telegramService;
 
@@ -34,7 +34,7 @@ class IonqScraper
                 ->get($company->blog_url);
             
             if (!$response->successful()) {
-                Log::error("Failed to fetch IonQ blog: HTTP {$response->status()}");
+                Log::error("Failed to fetch Intel newsroom: HTTP {$response->status()}");
                 return;
             }
 
@@ -43,12 +43,12 @@ class IonqScraper
             @$dom->loadHTML($html);
             $xpath = new \DOMXPath($dom);
 
-            // Find all blog post containers
-            $postNodes = $xpath->query('//div[contains(@class, "ResourceGridItem")]');
+            // Find all blog post containers using the provided selector
+            $postNodes = $xpath->query('//div[contains(@class, "post-result-item-container")]');
             
             $scrapedCount = 0;
             $newPostsCount = 0;
-            $maxPosts = 3; // Only scrape last 3 posts as requested
+            $maxPosts = 5; // Scrape last 5 posts
 
             foreach ($postNodes as $index => $postNode) {
                 if ($scrapedCount >= $maxPosts) {
@@ -69,7 +69,7 @@ class IonqScraper
                         }
                     }
                 } catch (\Exception $e) {
-                    Log::error("Error processing IonQ post: " . $e->getMessage());
+                    Log::error("Error processing Intel post: " . $e->getMessage());
                     continue;
                 }
             }
@@ -84,140 +84,72 @@ class IonqScraper
                     ->update(['user_notified_at' => now()]);
             }
             
-            Log::info("IonQ scraping completed. Scraped {$scrapedCount} posts, {$newPostsCount} new.");
+            Log::info("Intel scraping completed. Scraped {$scrapedCount} posts, {$newPostsCount} new.");
             
         } catch (\Exception $e) {
-            Log::error("IonQ scraping failed: " . $e->getMessage());
+            Log::error("Intel scraping failed: " . $e->getMessage());
         }
     }
 
     private function extractPostData(\DOMElement $postNode, \DOMXPath $xpath, Company $company): ?array
     {
         // Extract title
-        $titleNodes = $xpath->query('.//span[contains(@class, "resources-item-title")]', $postNode);
+        $titleNodes = $xpath->query('.//h2', $postNode);
         if ($titleNodes->length === 0) {
             return null;
         }
         $title = trim($titleNodes->item(0)->textContent);
 
-        // Extract link
-        $linkNodes = $xpath->query('.//a[@class="resources-panel"]', $postNode);
-        if ($linkNodes->length === 0) {
-            return null;
-        }
-        $relativeUrl = $linkNodes->item(0)->getAttribute('href');
-        $fullUrl = $this->buildFullUrl($relativeUrl, $company->url);
-
         // Extract date
-        $dateNodes = $xpath->query('.//span[contains(@class, "resources-item-date")]', $postNode);
+        $dateNodes = $xpath->query('.//p[contains(@class, "item-post-date")]', $postNode);
         $publishedAt = null;
         if ($dateNodes->length > 0) {
             $dateString = trim($dateNodes->item(0)->textContent);
             $publishedAt = $this->parseDate($dateString);
         }
 
-        // Extract content (we'll need to fetch the full post for content)
-        $content = $this->fetchPostContent($fullUrl);
+        // Extract content (excerpt)
+        $contentNodes = $xpath->query('.//p[contains(@class, "item-excerpt")]', $postNode);
+        $content = '';
+        if ($contentNodes->length > 0) {
+            $content = trim($contentNodes->item(0)->textContent);
+        }
+
+        // Extract URL
+        $linkNodes = $xpath->query('.//a[contains(@class, "post-result-item")]', $postNode);
+        $postUrl = $company->blog_url; // fallback
+        if ($linkNodes->length > 0) {
+            $postUrl = $linkNodes->item(0)->getAttribute('href');
+        }
 
         return [
             'title' => $title,
-            'url' => $fullUrl,
+            'url' => $postUrl,
             'published_at' => $publishedAt,
             'content' => $content,
-            'external_id' => $this->generateExternalId($fullUrl),
+            'external_id' => $this->generateExternalId($title, $dateString ?? ''),
         ];
-    }
-
-    private function buildFullUrl(string $relativeUrl, string $baseUrl): string
-    {
-        if (str_starts_with($relativeUrl, 'http')) {
-            return $relativeUrl;
-        }
-        
-        if (str_starts_with($relativeUrl, '/')) {
-            return rtrim($baseUrl, '/') . $relativeUrl;
-        }
-        
-        return rtrim($baseUrl, '/') . '/' . ltrim($relativeUrl, '/');
     }
 
     private function parseDate(string $dateString): ?Carbon
     {
         try {
-            // IonQ uses format like "June 13, 2025"
+            // Intel uses format like "September 18, 2025"
             return Carbon::createFromFormat('F j, Y', $dateString);
         } catch (\Exception $e) {
             try {
                 // Fallback to other common formats
                 return Carbon::parse($dateString);
             } catch (\Exception $e2) {
-                Log::warning("Could not parse date: {$dateString}");
+                Log::warning("Could not parse Intel date: {$dateString}");
                 return null;
             }
         }
     }
 
-    private function fetchPostContent(string $url): string
+    private function generateExternalId(string $title, string $date): string
     {
-        try {
-            $response = Http::timeout(30)->get($url);
-            
-            if (!$response->successful()) {
-                return '';
-            }
-
-            $html = $response->body();
-            $dom = new \DOMDocument();
-            @$dom->loadHTML($html);
-            $xpath = new \DOMXPath($dom);
-
-            // Try to find the main content area
-            $contentSelectors = [
-                '//article',
-                '//div[contains(@class, "content")]',
-                '//div[contains(@class, "post-content")]',
-                '//div[contains(@class, "entry-content")]',
-                '//main',
-            ];
-
-            foreach ($contentSelectors as $selector) {
-                $contentNodes = $xpath->query($selector);
-                if ($contentNodes->length > 0) {
-                    $content = '';
-                    foreach ($contentNodes as $node) {
-                        $content .= $this->getTextContent($node);
-                    }
-                    if (!empty(trim($content))) {
-                        return trim($content);
-                    }
-                }
-            }
-
-            // Fallback: get all text content
-            return $this->getTextContent($dom->documentElement);
-            
-        } catch (\Exception $e) {
-            Log::error("Failed to fetch post content from {$url}: " . $e->getMessage());
-            return '';
-        }
-    }
-
-    private function getTextContent(\DOMNode $node): string
-    {
-        $text = '';
-        foreach ($node->childNodes as $child) {
-            if ($child->nodeType === XML_TEXT_NODE) {
-                $text .= $child->textContent;
-            } elseif ($child->nodeType === XML_ELEMENT_NODE) {
-                $text .= $this->getTextContent($child) . ' ';
-            }
-        }
-        return $text;
-    }
-
-    private function generateExternalId(string $url): string
-    {
-        return md5($url);
+        return 'intel_' . md5($title . $date);
     }
 
     private function savePost(array $postData, Company $company): bool

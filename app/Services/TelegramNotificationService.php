@@ -94,6 +94,44 @@ class TelegramNotificationService
         }
     }
 
+    public function sendHighScorePostNotification(Post $post): void
+    {
+        if (!$this->isConfigured()) {
+            Log::warning('Telegram bot not configured, skipping high-score notification');
+            return;
+        }
+
+        try {
+            $message = $this->buildHighScorePostMessage($post);
+            
+            $response = Http::timeout(10)->post("https://api.telegram.org/bot{$this->botToken}/sendMessage", [
+                'chat_id' => $this->chatId,
+                'text' => $message,
+                'parse_mode' => 'HTML',
+                'disable_web_page_preview' => false,
+            ]);
+
+            if (!$response->successful()) {
+                Log::error('Failed to send Telegram high-score notification', [
+                    'status' => $response->status(),
+                    'response' => $response->body(),
+                    'post_id' => $post->id,
+                ]);
+            } else {
+                Log::info('Telegram high-score notification sent successfully', [
+                    'post_id' => $post->id,
+                    'company' => $post->company->name,
+                    'score' => $post->importance_score,
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Exception while sending Telegram high-score notification', [
+                'error' => $e->getMessage(),
+                'post_id' => $post->id,
+            ]);
+        }
+    }
+
     private function buildSinglePostMessage(Post $post): string
     {
         $company = $post->company;
@@ -133,12 +171,45 @@ class TelegramNotificationService
         return $message;
     }
 
+    private function buildHighScorePostMessage(Post $post): string
+    {
+        $company = $post->company;
+        $emoji = $this->getCompanyEmoji($company->name);
+        
+        // Determine the alert level based on score
+        $alertLevel = $post->importance_score >= 90 ? '🚨 CRITICAL' : 
+                     ($post->importance_score >= 80 ? '🔥 HIGH' : '⭐ IMPORTANT');
+        
+        $message = "{$alertLevel} NEWS ALERT! {$emoji}\n\n";
+        $message .= "📊 <b>Importance Score: {$post->importance_score}/100</b>\n";
+        
+        if ($post->is_huge_news) {
+            $message .= "🚨 <b>HUGE NEWS DETECTED!</b>\n\n";
+        }
+        
+        $message .= "🏢 <b>{$company->name}</b>\n";
+        $message .= "📝 <b>{$this->escapeHtml($post->title)}</b>\n\n";
+        
+        if ($post->content && strlen($post->content) > 0) {
+            $preview = $this->truncateContent($post->content, 300);
+            $message .= "📄 <i>{$this->escapeHtml($preview)}</i>\n\n";
+        }
+        
+        $message .= "🔗 <a href=\"{$post->url}\">Read full post</a>\n";
+        $message .= "🏢 <a href=\"{$company->url}\">{$company->name} Website</a>\n";
+        $message .= "📅 Published: {$post->published_at->format('M j, Y \a\t g:i A')}\n";
+        $message .= "🤖 Scored: {$post->scored_at->format('M j, Y \a\t g:i A')}";
+        
+        return $message;
+    }
+
     private function getCompanyEmoji(string $companyName): string
     {
         $emojis = [
             'ionq' => '⚛️',
             'rigetti' => '🔬',
             'd-wave' => '🌊',
+            'intel' => '🔵',
             'ibm' => '🔵',
             'google' => '🔍',
             'microsoft' => '🪟',

@@ -72,4 +72,33 @@ class Company extends Model
             ->whereNull('user_notified_at')
             ->count();
     }
+
+    public function getLatestBlogScore(): ?int
+    {
+        $latestPost = $this->posts()
+            ->whereNotNull('importance_score')
+            ->latest('published_at')
+            ->first();
+
+        return $latestPost ? $latestPost->importance_score : null;
+    }
+
+    public function getLatestBlogScoreWithStatus(): ?array
+    {
+        $latestPost = $this->posts()
+            ->whereNotNull('importance_score')
+            ->latest('published_at')
+            ->first();
+
+        if (!$latestPost) {
+            return null;
+        }
+
+        return [
+            'score' => $latestPost->importance_score,
+            'is_huge' => $latestPost->is_huge_news,
+            'scored_at' => $latestPost->scored_at,
+            'post_title' => $latestPost->title,
+        ];
+    }
 }

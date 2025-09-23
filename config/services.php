@@ -37,6 +37,10 @@ return [
         'api_key' => env('FINNHUB_API_KEY'),
     ],
 
+    'anthropic' => [
+        'api_key' => env('ANTHROPIC_API_KEY'),
+    ],
+
     'proxy' => [
         'scrapingbee_api_key' => env('SCRAPINGBEE_API_KEY'),
     ],

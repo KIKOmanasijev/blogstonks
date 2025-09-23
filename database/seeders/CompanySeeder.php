@@ -13,7 +13,7 @@ class CompanySeeder extends Seeder
      */
     public function run(): void
     {
-        Company::create([
+        Company::firstOrCreate([
             'name' => 'IonQ',
             'url' => 'https://ionq.com',
             'blog_url' => 'https://ionq.com/blog',
@@ -26,7 +26,7 @@ class CompanySeeder extends Seeder
             'is_active' => true,
         ]);
 
-        Company::create([
+        Company::firstOrCreate([
             'name' => 'D-Wave Quantum',
             'url' => 'https://www.dwavequantum.com',
             'blog_url' => 'https://www.dwavequantum.com/company/newsroom/',
@@ -39,7 +39,7 @@ class CompanySeeder extends Seeder
             'is_active' => true,
         ]);
 
-        Company::create([
+        Company::firstOrCreate([
             'name' => 'Tesla',
             'url' => 'https://www.tesla.com',
             'blog_url' => 'https://www.tesla.com/blog',
@@ -52,7 +52,7 @@ class CompanySeeder extends Seeder
             'is_active' => false, // Temporarily disabled due to bot protection
         ]);
 
-        Company::create([
+        Company::firstOrCreate([
             'name' => 'Quantum Computing Inc.',
             'url' => 'https://quantumcomputinginc.com',
             'blog_url' => 'https://quantumcomputinginc.com/news',
@@ -62,6 +62,32 @@ class CompanySeeder extends Seeder
             'content_selector' => '.paperTemplate_paper__tvabE',
             'date_selector' => '.MuiTypography-h5',
             'link_selector' => '.MuiButton-root',
+            'is_active' => true,
+        ]);
+
+        Company::firstOrCreate([
+            'name' => 'Rigetti Computing',
+            'url' => 'https://www.rigetti.com',
+            'blog_url' => 'https://www.rigetti.com/rigetti-computing-news',
+            'favicon_url' => 'https://companieslogo.com/img/orig/RGTI-3681061a.png?t=1730913635',
+            'ticker' => 'RGTI',
+            'title_selector' => 'h3',
+            'content_selector' => 'p',
+            'date_selector' => '.date',
+            'link_selector' => '.read-more',
+            'is_active' => true,
+        ]);
+
+        Company::firstOrCreate([
+            'name' => 'Intel Corporation',
+            'url' => 'https://www.intel.com',
+            'blog_url' => 'https://newsroom.intel.com',
+            'favicon_url' => 'https://icon2.cleanpng.com/20180525/uoi/avqpba21h.webp',
+            'ticker' => 'INTC',
+            'title_selector' => 'h2',
+            'content_selector' => '.item-excerpt',
+            'date_selector' => '.item-post-date',
+            'link_selector' => '.post-result-item',
             'is_active' => true,
         ]);
     }

@@ -17,6 +17,7 @@ class Dashboard extends Component
             ->map(function ($company) {
                 $company->new_posts_count = $company->getNewPostsCountForUser(Auth::user());
                 $company->latest_stock_price = $company->getLatestStockPrice();
+                $company->latest_blog_score = $company->getLatestBlogScoreWithStatus();
                 return $company;
             });
 

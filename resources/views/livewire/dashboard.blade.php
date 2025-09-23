@@ -20,7 +20,7 @@
                                 Stock Price
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Total Posts
+                                LBS
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 New Posts
@@ -79,8 +79,21 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $company->posts_count }}
-                                </td>
+                                    @if($company->latest_blog_score)
+                                        <div class="flex flex-col">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="font-medium">{{ $company->latest_blog_score['score'] }}</span>
+                                                @if($company->latest_blog_score['is_huge'])
+                                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                        HUGE
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @else
+                                        <span class="text-sm text-gray-400">No score</span>
+                                    @endif
+                                </td>   
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($company->new_posts_count > 0)
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">

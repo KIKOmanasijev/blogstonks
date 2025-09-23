@@ -23,13 +23,40 @@
                     <div class="bg-white shadow rounded-lg p-6">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
-                                <h3 class="text-lg font-medium text-gray-900 mb-2">
-                                    <a href="{{ $post->url }}" 
-                                       target="_blank" 
-                                       class="hover:text-blue-600 transition-colors">
-                                        {{ $post->title }}
-                                    </a>
-                                </h3>
+                                <div class="flex items-start justify-between mb-2">
+                                    <h3 class="text-lg font-medium text-gray-900 flex-1">
+                                        <a href="{{ $post->url }}" 
+                                           target="_blank" 
+                                           class="hover:text-blue-600 transition-colors">
+                                            {{ $post->title }}
+                                        </a>
+                                    </h3>
+                                    
+                                    @if($post->isClassified())
+                                        <div class="ml-4 flex items-center space-x-2">
+                                            <div class="flex items-center space-x-1">
+                                                <span class="text-sm font-medium text-gray-700">Score:</span>
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium 
+                                                    {{ $post->importance_score >= 80 ? 'bg-red-100 text-red-800' : 
+                                                       ($post->importance_score >= 60 ? 'bg-orange-100 text-orange-800' : 
+                                                       ($post->importance_score >= 40 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800')) }}">
+                                                    {{ $post->importance_score }}
+                                                </span>
+                                            </div>
+                                            @if($post->is_huge_news)
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                    HUGE NEWS
+                                                </span>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <div class="ml-4">
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                                                Not Scored
+                                            </span>
+                                        </div>
+                                    @endif
+                                </div>
                                 
                                 @if($post->content)
                                     <p class="text-gray-600 mb-3 line-clamp-3">
@@ -47,6 +74,14 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     {{ $post->published_at->diffForHumans() }}
+                                    
+                                    @if($post->isClassified())
+                                        <span class="mx-2">•</span>
+                                        <svg class="flex-shrink-0 mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Scored {{ $post->scored_at->diffForHumans() }}
+                                    @endif
                                 </div>
                             </div>
                             
