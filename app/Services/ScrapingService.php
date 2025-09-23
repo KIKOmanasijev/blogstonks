@@ -1,0 +1,87 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Company;
+use App\Services\Scrapers\IonqScraper;
+use App\Services\Scrapers\DwaveScraper;
+use App\Services\Scrapers\TeslaScraper;
+use App\Services\Scrapers\QciScraper;
+use App\Services\ProxyService;
+use Illuminate\Support\Facades\Log;
+
+class ScrapingService
+{
+    protected array $scrapers = [
+        'ionq' => IonqScraper::class,
+        'dwave' => DwaveScraper::class,
+        'tesla' => TeslaScraper::class,
+        'qci' => QciScraper::class,
+    ];
+
+    protected TelegramNotificationService $telegramService;
+    protected ProxyService $proxyService;
+
+    public function __construct(TelegramNotificationService $telegramService, ProxyService $proxyService)
+    {
+        $this->telegramService = $telegramService;
+        $this->proxyService = $proxyService;
+    }
+
+    public function scrapeAllCompanies(): void
+    {
+        $companies = Company::where('is_active', true)->get();
+        
+        foreach ($companies as $company) {
+            $this->scrapeCompany($company);
+        }
+    }
+
+    public function scrapeCompany(Company $company): void
+    {
+        try {
+            $scraperClass = $this->getScraperForCompany($company);
+            
+            if (!$scraperClass) {
+                Log::warning("No scraper found for company: {$company->name}");
+                return;
+            }
+
+            // Inject dependencies based on scraper type
+            if ($scraperClass === TeslaScraper::class) {
+                $scraper = new $scraperClass($this->telegramService, $this->proxyService);
+            } else {
+                $scraper = new $scraperClass($this->telegramService);
+            }
+            $scraper->scrape($company);
+            
+        } catch (\Exception $e) {
+            Log::error("Failed to scrape company {$company->name}: " . $e->getMessage());
+        }
+    }
+
+    private function getScraperForCompany(Company $company): ?string
+    {
+        // Determine scraper based on company URL or name
+        $url = strtolower($company->url);
+        $name = strtolower($company->name);
+        
+        if (str_contains($url, 'ionq.com')) {
+            return $this->scrapers['ionq'];
+        }
+        
+        if (str_contains($url, 'dwavequantum.com') || str_contains($name, 'd-wave')) {
+            return $this->scrapers['dwave'];
+        }
+        
+        if (str_contains($url, 'tesla.com') || str_contains($name, 'tesla')) {
+            return $this->scrapers['tesla'];
+        }
+        
+        if (str_contains($url, 'quantumcomputinginc.com') || str_contains($name, 'quantum computing inc')) {
+            return $this->scrapers['qci'];
+        }
+        
+        return null;
+    }
+}
