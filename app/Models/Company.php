@@ -41,6 +41,17 @@ class Company extends Model
             ->withTimestamps();
     }
 
+    public function followers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_company_follows')
+            ->withTimestamps();
+    }
+
+    public function isFollowedBy(User $user): bool
+    {
+        return $this->followers()->where('user_id', $user->id)->exists();
+    }
+
     public function stockPrices(): HasMany
     {
         return $this->hasMany(StockPrice::class);

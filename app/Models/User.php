@@ -66,4 +66,10 @@ class User extends Authenticatable
             ->withPivot('last_viewed_at')
             ->withTimestamps();
     }
+
+    public function followedCompanies(): BelongsToMany
+    {
+        return $this->belongsToMany(Company::class, 'user_company_follows')
+            ->withTimestamps();
+    }
 }

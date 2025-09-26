@@ -30,7 +30,8 @@ class Dashboard extends Component
 
     public function render()
     {
-        $companies = Company::where('is_active', true)
+        $companies = Auth::user()->followedCompanies()
+            ->where('is_active', true)
             ->withCount('posts')
             ->with('stockPrices')
             ->get()
