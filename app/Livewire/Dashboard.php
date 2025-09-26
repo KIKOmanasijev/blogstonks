@@ -28,6 +28,16 @@ class Dashboard extends Component
         $this->dispatch('all-marked-as-read');
     }
 
+    public function unfollowCompany($companyId)
+    {
+        $user = Auth::user();
+        $company = Company::findOrFail($companyId);
+        
+        $user->followedCompanies()->detach($companyId);
+        
+        $this->dispatch('company-unfollowed', companyId: $companyId);
+    }
+
     public function render()
     {
         $companies = Auth::user()->followedCompanies()

@@ -1,9 +1,28 @@
 <div>
-    <div class="space-y-6">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900">All Companies</h1>
-            <p class="mt-1 text-sm text-gray-600">Discover and follow companies to track their latest news</p>
+    <!-- Green Header Section -->
+    <div class="relative bg-gradient-to-r from-green-600 to-green-700 text-white overflow-hidden pt-16">
+        <!-- Low-opacity shapes -->
+        <div class="absolute inset-0">
+            <div class="absolute top-0 left-0 w-64 h-64 bg-white opacity-10 rounded-full -translate-x-32 -translate-y-32"></div>
+            <div class="absolute top-0 right-0 w-48 h-48 bg-white opacity-10 rounded-full translate-x-24 -translate-y-24"></div>
+            <div class="absolute bottom-0 left-1/4 w-32 h-32 bg-white opacity-10 rounded-full translate-y-16"></div>
+            <div class="absolute bottom-0 right-1/3 w-40 h-40 bg-white opacity-10 rounded-full translate-y-20"></div>
         </div>
+        
+        <div class="relative z-10 py-8">
+            <div class="container mx-auto px-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold">Companies</h1>
+                        <p class="mt-1 text-green-100">Discover and follow companies to track their latest news</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        <div class="container mx-auto px-6 py-6">
 
         @if(session('message'))
             <div class="rounded-md bg-green-50 p-4">
@@ -250,5 +269,6 @@
                 <p class="mt-1 text-sm text-gray-500">Companies will appear here once they are added to the system.</p>
             </div>
         @endif
+        </div>
     </div>
 </div>

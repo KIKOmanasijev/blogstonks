@@ -32,7 +32,12 @@
     .dark {
         --color-accent: var(--color-white);
         --color-accent-content: var(--color-white);
-        --color-accent-foreground: var(--color-neutral-800);
+        --color-accent-foreground: var(--color-white);
+    }
+    
+    /* Override accent content to white for transparent header */
+    :root {
+        --color-accent-content: #ffffff;
     }
 }
 
