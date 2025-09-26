@@ -3,11 +3,31 @@
 namespace App\Livewire;
 
 use App\Models\Company;
+use App\Models\UserCompanyView;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class Dashboard extends Component
 {
+    public function markAllAsRead()
+    {
+        $companies = Company::where('is_active', true)->get();
+        
+        foreach ($companies as $company) {
+            UserCompanyView::updateOrCreate(
+                [
+                    'user_id' => Auth::id(),
+                    'company_id' => $company->id,
+                ],
+                [
+                    'last_viewed_at' => now(),
+                ]
+            );
+        }
+        
+        $this->dispatch('all-marked-as-read');
+    }
+
     public function render()
     {
         $companies = Company::where('is_active', true)

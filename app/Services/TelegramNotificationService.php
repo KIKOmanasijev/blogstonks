@@ -101,6 +101,16 @@ class TelegramNotificationService
             return;
         }
 
+        // Only send notifications for posts published within the last 24 hours
+        if ($post->published_at->diffInHours(now()) > 24) {
+            Log::info('Skipping Telegram notification for old post', [
+                'post_id' => $post->id,
+                'published_at' => $post->published_at,
+                'hours_old' => $post->published_at->diffInHours(now()),
+            ]);
+            return;
+        }
+
         try {
             $message = $this->buildHighScorePostMessage($post);
             

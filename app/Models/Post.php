@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Log;
 use App\Services\AnthropicService;
 
 class Post extends Model
@@ -38,9 +39,12 @@ class Post extends Model
     {
         // Skip if already classified and not forcing
         if (!$force && $this->isClassified()) {
+            Log::info("Post already classified, skipping", ['post_id' => $this->id, 'title' => $this->title]);
             return true; // Already classified, consider it successful
         }
 
+        Log::info("Starting classification for post", ['post_id' => $this->id, 'title' => $this->title, 'force' => $force]);
+        
         $anthropicService = app(AnthropicService::class);
         
         // Get a truncated description from content (first 500 characters)
@@ -56,15 +60,29 @@ class Post extends Model
                 'reasoning' => $classification['reasoning'] ?? null,
             ]);
             
-            // Send Telegram notification if score is >= 75
-            if ($classification['score'] >= 75) {
+            Log::info("Post classified successfully", [
+                'post_id' => $this->id, 
+                'score' => $classification['score'], 
+                'huge' => $classification['huge']
+            ]);
+            
+            // Send Telegram notification if score is >= 75 and not already notified
+            if ($classification['score'] >= 75 && !$this->user_notified_at) {
+                Log::info("Sending Telegram notification for high score post", [
+                    'post_id' => $this->id, 
+                    'score' => $classification['score']
+                ]);
                 $telegramService = app(\App\Services\TelegramNotificationService::class);
                 $telegramService->sendHighScorePostNotification($this);
+                
+                // Mark as notified to prevent duplicate notifications
+                $this->update(['user_notified_at' => now()]);
             }
             
             return true;
         }
         
+        Log::warning("Failed to classify post", ['post_id' => $this->id, 'title' => $this->title]);
         return false;
     }
 
