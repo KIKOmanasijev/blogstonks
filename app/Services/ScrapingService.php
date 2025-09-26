@@ -11,6 +11,7 @@ use App\Services\Scrapers\RigettiScraper;
 use App\Services\Scrapers\IntelScraper;
 use App\Services\Scrapers\SealsqScraper;
 use App\Services\Scrapers\AmdScraper;
+use App\Services\Scrapers\CifrScraper;
 use App\Services\ProxyService;
 use Illuminate\Support\Facades\Log;
 
@@ -25,6 +26,7 @@ class ScrapingService
         'intel' => IntelScraper::class,
         'sealsq' => SealsqScraper::class,
         'amd' => AmdScraper::class,
+        'cifr' => CifrScraper::class,
     ];
 
     protected TelegramNotificationService $telegramService;
@@ -104,6 +106,10 @@ class ScrapingService
         
         if (str_contains($url, 'amd.com') || str_contains($name, 'amd') || str_contains($name, 'advanced micro devices')) {
             return $this->scrapers['amd'];
+        }
+        
+        if (str_contains($url, 'ciphermining.com') || str_contains($name, 'cipher') || str_contains($name, 'cifr')) {
+            return $this->scrapers['cifr'];
         }
         
         return null;

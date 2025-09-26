@@ -116,5 +116,18 @@ class CompanySeeder extends Seeder
             'link_selector' => '.related-content-card a',
             'is_active' => true,
         ]);
+
+        Company::firstOrCreate([
+            'name' => 'Cipher Mining Inc',
+            'url' => 'https://investors.ciphermining.com',
+            'blog_url' => 'https://investors.ciphermining.com/news-events/press-releases',
+            'favicon_url' => 'https://lh-prod-mid-pub-newsf10.s3.amazonaws.com/logo/CIFR.png',
+            'ticker' => 'CIFR',
+            'title_selector' => 'article > h2 .field__item',
+            'content_selector' => '.node__content',
+            'date_selector' => '.ndq-date .field__item',
+            'link_selector' => '.nir-widget--list > article',
+            'is_active' => true,
+        ]);
     }
 }
