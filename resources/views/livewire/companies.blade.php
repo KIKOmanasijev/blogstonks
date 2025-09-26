@@ -64,17 +64,15 @@
                     <div class="bg-white shadow rounded-lg p-6 flex flex-col h-full">
                         <div class="flex items-start justify-between mb-4">
                             <div class="flex items-center">
-                                <div class="flex-shrink-0 h-12 w-12">
-                                    @if($company->favicon_url)
-                                        <img src="{{ $company->favicon_url }}" alt="{{ $company->name }}" class="h-12 w-12 rounded-full object-cover">
-                                    @else
-                                        <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                                            <span class="text-lg font-medium text-blue-600">
-                                                {{ strtoupper(substr($company->name, 0, 2)) }}
-                                            </span>
-                                        </div>
-                                    @endif
-                                </div>
+                                @if($company->favicon_url)
+                                    <img src="{{ $company->favicon_url }}" alt="{{ $company->name }}" class="h-8 w-8 rounded-full object-cover">
+                                @else
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <span class="font-medium text-blue-600">
+                                            {{ strtoupper(substr($company->name, 0, 2)) }}
+                                        </span>
+                                    </div>
+                                @endif
                                 <div class="ml-4">
                                     <h3 class="text-lg font-medium text-gray-900">{{ $company->name }}</h3>
                                     <p class="text-sm text-gray-500">{{ $company->url }}</p>
@@ -82,22 +80,20 @@
                             </div>
                         </div>
 
-                        <div class="flex-1">
-                            <div class="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <p class="text-sm text-gray-500">Ticker</p>
-                                    <p class="text-sm font-medium text-gray-900">
-                                        {{ $company->ticker ?? 'N/A' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-500">Posts</p>
-                                    <p class="text-sm font-medium text-gray-900">{{ $company->posts_count }}</p>
-                                </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500">Ticker</p>
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ $company->ticker ?? 'N/A' }}
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Posts</p>
+                                <p class="text-sm font-medium text-gray-900">{{ $company->posts_count }}</p>
                             </div>
 
                             @if($company->latest_stock_price)
-                                <div class="mb-4">
+                                <div>
                                     <p class="text-sm text-gray-500">Stock Price</p>
                                     <div class="flex items-center">
                                         <span class="text-lg font-medium text-gray-900">${{ number_format($company->latest_stock_price->price, 2) }}</span>
@@ -111,7 +107,7 @@
                             @endif
 
                             @if($company->latest_blog_score)
-                                <div class="mb-4">
+                                <div>
                                     <p class="text-sm text-gray-500">Latest Blog Score</p>
                                     <div class="flex items-center space-x-2">
                                         <span class="text-lg font-medium text-gray-900">{{ $company->latest_blog_score['score'] }}</span>
@@ -128,11 +124,11 @@
                         <div class="mt-4 pt-4 border-t border-gray-200">
                             <div class="flex space-x-2">
                                 <a href="{{ route('companies.show', $company) }}" 
-                                    class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                    class="flex-1 inline-flex items-center justify-center px-4 py-1 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
                                     View Posts
                                 </a>
                                 <button wire:click="toggleFollow({{ $company->id }})" 
-                                    class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white {{ $company->is_followed ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700' }}">
+                                    class="flex-1 inline-flex items-center justify-center px-4 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white {{ $company->is_followed ? 'bg-red-500 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700' }}">
                                     {{ $company->is_followed ? '- Unfollow' : '+ Follow' }}
                                 </button>
                             </div>

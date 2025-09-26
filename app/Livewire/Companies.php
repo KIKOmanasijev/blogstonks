@@ -55,7 +55,7 @@ class Companies extends Component
         $companies = Company::where('is_active', true)
             ->withCount('posts')
             ->with('stockPrices')
-            ->paginate(6);
+            ->paginate(9);
 
         // Add additional data to each company
         $companies->getCollection()->transform(function ($company) {
