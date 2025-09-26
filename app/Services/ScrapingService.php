@@ -9,6 +9,8 @@ use App\Services\Scrapers\TeslaScraper;
 use App\Services\Scrapers\QciScraper;
 use App\Services\Scrapers\RigettiScraper;
 use App\Services\Scrapers\IntelScraper;
+use App\Services\Scrapers\SealsqScraper;
+use App\Services\Scrapers\AmdScraper;
 use App\Services\ProxyService;
 use Illuminate\Support\Facades\Log;
 
@@ -21,6 +23,8 @@ class ScrapingService
         'qci' => QciScraper::class,
         'rigetti' => RigettiScraper::class,
         'intel' => IntelScraper::class,
+        'sealsq' => SealsqScraper::class,
+        'amd' => AmdScraper::class,
     ];
 
     protected TelegramNotificationService $telegramService;
@@ -92,6 +96,14 @@ class ScrapingService
         
         if (str_contains($url, 'intel.com') || str_contains($name, 'intel')) {
             return $this->scrapers['intel'];
+        }
+        
+        if (str_contains($url, 'sealsq.com') || str_contains($name, 'sealsq')) {
+            return $this->scrapers['sealsq'];
+        }
+        
+        if (str_contains($url, 'amd.com') || str_contains($name, 'amd') || str_contains($name, 'advanced micro devices')) {
+            return $this->scrapers['amd'];
         }
         
         return null;

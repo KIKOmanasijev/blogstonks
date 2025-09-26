@@ -90,5 +90,31 @@ class CompanySeeder extends Seeder
             'link_selector' => '.post-result-item',
             'is_active' => true,
         ]);
+
+        Company::firstOrCreate([
+            'name' => 'SEALSQ Corp',
+            'url' => 'https://www.sealsq.com',
+            'blog_url' => 'https://www.sealsq.com',
+            'favicon_url' => 'https://media.licdn.com/dms/image/v2/C4D0BAQEkOsb9f-tNIQ/company-logo_200_200/company-logo_200_200/0/1679499674670/sealsq_logo?e=2147483647&v=beta&t=_NI1pHsH-WjROzSs_gVeIaOa2f23ji-41jLyiqkht8o',
+            'ticker' => 'LAES',
+            'title_selector' => 'h1 span',
+            'content_selector' => '.blog-post__body span',
+            'date_selector' => 'time, .date, meta[property="article:published_time"]',
+            'link_selector' => '.buttons-container a',
+            'is_active' => true,
+        ]);
+
+        Company::firstOrCreate([
+            'name' => 'Advanced Micro Devices',
+            'url' => 'https://www.amd.com',
+            'blog_url' => 'https://www.amd.com/en/newsroom.html',
+            'favicon_url' => 'https://cdn.freebiesupply.com/logos/large/2x/amd-4-logo-png-transparent.png',
+            'ticker' => 'AMD',
+            'title_selector' => 'h1',
+            'content_selector' => '.cmp-container__content',
+            'date_selector' => '.card-date',
+            'link_selector' => '.related-content-card a',
+            'is_active' => true,
+        ]);
     }
 }

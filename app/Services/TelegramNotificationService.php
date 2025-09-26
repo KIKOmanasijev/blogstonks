@@ -210,6 +210,8 @@ class TelegramNotificationService
             'rigetti' => '🔬',
             'd-wave' => '🌊',
             'intel' => '🔵',
+            'sealsq' => '🔐',
+            'amd' => '🔴',
             'ibm' => '🔵',
             'google' => '🔍',
             'microsoft' => '🪟',

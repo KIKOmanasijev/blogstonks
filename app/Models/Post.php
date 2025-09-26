@@ -19,6 +19,7 @@ class Post extends Model
         'is_huge_news',
         'importance_score',
         'scored_at',
+        'reasoning',
     ];
 
     protected $casts = [
@@ -52,6 +53,7 @@ class Post extends Model
                 'is_huge_news' => $classification['huge'],
                 'importance_score' => $classification['score'],
                 'scored_at' => now(),
+                'reasoning' => $classification['reasoning'] ?? null,
             ]);
             
             // Send Telegram notification if score is >= 75

@@ -17,7 +17,6 @@ Route::get('dashboard', Dashboard::class)
 
 Route::middleware(['auth'])->group(function () {
     Route::get('companies/{company}', SitePosts::class)->name('companies.show');
-    
     Route::redirect('settings', 'settings/profile');
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');

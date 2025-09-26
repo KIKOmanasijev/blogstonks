@@ -81,6 +81,7 @@ HUGE news is defined strictly as corporate events with clear and measurable fina
 - Investments or funding rounds above **$500 million**  
 - Acquisitions or mergers of major competitors (with disclosed or implied deal values in the billions)  
 - Government contracts worth more than **$5 million**  
+- Major partnership with the Big Tech companies (Tech Giants, FAANG, and etc) in tech USA.
 - IPO announcements or listings on major exchanges
 
 Ignore general product updates, technology breakthroughs, research collaborations, roadmap announcements, hiring news, or acquisitions without disclosed deal sizes. These do **not** qualify as huge news.  
@@ -90,7 +91,8 @@ Return only a JSON object in the following format:
 ```json
 {
   \"huge\": true/false,
-  \"score\": 0 to 100 value
+  \"score\": 0 to 100 value,
+  \"reasoning\": a short explanation of why you gave the score you did
 }
 ```
 
