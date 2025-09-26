@@ -142,5 +142,31 @@ class CompanySeeder extends Seeder
             'link_selector' => '.content > .media',
             'is_active' => true,
         ]);
+
+        Company::firstOrCreate([
+            'name' => 'Rekor Systems Inc',
+            'url' => 'https://www.rekor.ai',
+            'blog_url' => 'https://www.rekor.ai/blog',
+            'favicon_url' => 'https://companieslogo.com/img/orig/REKR-0fc5c127.png?t=1720244493',
+            'ticker' => 'REKR',
+            'title_selector' => 'h3.blog-title',
+            'content_selector' => 'p.text-size-small',
+            'date_selector' => 'div.text-size-small',
+            'link_selector' => 'a.blog-item',
+            'is_active' => true,
+        ]);
+
+        Company::firstOrCreate([
+            'name' => 'Nuvve Holding Corp',
+            'url' => 'https://investors.nuvve.com',
+            'blog_url' => 'https://investors.nuvve.com',
+            'favicon_url' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSx6fr02xwq45Xsb6Ww8-3UGFWG2wQK46265A&s',
+            'ticker' => 'NVVE',
+            'title_selector' => '.nir-widget--news--headline a',
+            'content_selector' => '.nir-widget--news--teaser',
+            'date_selector' => '.ndq-press-date',
+            'link_selector' => '.nir-widget--news--headline a',
+            'is_active' => true,
+        ]);
     }
 }

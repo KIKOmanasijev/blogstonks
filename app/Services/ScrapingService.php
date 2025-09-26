@@ -13,6 +13,8 @@ use App\Services\Scrapers\SealsqScraper;
 use App\Services\Scrapers\AmdScraper;
 use App\Services\Scrapers\CifrScraper;
 use App\Services\Scrapers\LciScraper;
+use App\Services\Scrapers\RekorScraper;
+use App\Services\Scrapers\NuvveScraper;
 use App\Services\ProxyService;
 use Illuminate\Support\Facades\Log;
 
@@ -29,6 +31,8 @@ class ScrapingService
         'amd' => AmdScraper::class,
         'cifr' => CifrScraper::class,
         'lci' => LciScraper::class,
+        'rekor' => RekorScraper::class,
+        'nuvve' => NuvveScraper::class,
     ];
 
     protected TelegramNotificationService $telegramService;
@@ -60,7 +64,7 @@ class ScrapingService
             }
 
             // Inject dependencies based on scraper type
-            if ($scraperClass === TeslaScraper::class) {
+            if ($scraperClass === TeslaScraper::class || $scraperClass === RekorScraper::class || $scraperClass === NuvveScraper::class) {
                 $scraper = new $scraperClass($this->telegramService, $this->proxyService);
             } else {
                 $scraper = new $scraperClass($this->telegramService);
@@ -116,6 +120,14 @@ class ScrapingService
         
         if (str_contains($url, 'standardlithium.com') || str_contains($name, 'standard lithium') || str_contains($name, 'lci')) {
             return $this->scrapers['lci'];
+        }
+        
+        if (str_contains($url, 'rekor.ai') || str_contains($name, 'rekor') || str_contains($name, 'rekor systems')) {
+            return $this->scrapers['rekor'];
+        }
+        
+        if (str_contains($url, 'investors.nuvve.com') || str_contains($name, 'nuvve') || str_contains($name, 'nuvve holding')) {
+            return $this->scrapers['nuvve'];
         }
         
         return null;
