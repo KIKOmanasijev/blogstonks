@@ -148,8 +148,8 @@
                                                 {{ $post->importance_score }}
                                             </span>
                                         </div>
-                                        @if($post->is_huge_news)
-                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        @if($post->is_huge_news && $post->published_at->diffInHours(now()) <= 12)
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse">
                                             HUGE NEWS
                                         </span>
                                         @endif

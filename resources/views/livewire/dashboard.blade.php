@@ -95,7 +95,7 @@
                                             <div class="flex items-center space-x-2">
                                                 <span class="font-medium">{{ $company->latest_blog_score['score'] }}</span>
                                                 @if($company->latest_blog_score['is_huge'])
-                                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse">
                                                         HUGE
                                                     </span>
                                                 @endif

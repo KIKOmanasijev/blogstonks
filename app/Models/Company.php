@@ -105,9 +105,12 @@ class Company extends Model
             return null;
         }
 
+        // Check if post is older than 12 hours for "huge" status
+        $isHuge = $latestPost->is_huge_news && $latestPost->published_at->diffInHours(now()) <= 12;
+
         return [
             'score' => $latestPost->importance_score,
-            'is_huge' => $latestPost->is_huge_news,
+            'is_huge' => $isHuge,
             'scored_at' => $latestPost->scored_at,
             'post_title' => $latestPost->title,
         ];

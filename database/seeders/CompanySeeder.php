@@ -135,7 +135,7 @@ class CompanySeeder extends Seeder
             'url' => 'https://www.standardlithium.com',
             'blog_url' => 'https://www.standardlithium.com/investors/news-events/press-releases',
             'favicon_url' => 'https://media.licdn.com/dms/image/v2/C560BAQFEgzHKNWogaQ/company-logo_200_200/company-logo_200_200/0/1657831113337/standard_lithium_logo?e=2147483647&v=beta&t=cwD0MuKb3grxt6N3_y_9X9bqa91itMr10_rPHIjFy80',
-            'ticker' => 'LCI',
+            'ticker' => 'SLI',
             'title_selector' => 'h1.article-heading',
             'content_selector' => '.full-news-article',
             'date_selector' => '.related-documents-line > time',
