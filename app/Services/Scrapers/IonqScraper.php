@@ -77,12 +77,7 @@ class IonqScraper
             // Update last scraped timestamp
             $company->update(['last_scraped_at' => now()]);
             
-            // Mark all new posts as notified (notifications now handled by classification)
-            if ($newPostsCount > 0) {
-                $company->posts()
-                    ->whereNull('user_notified_at')
-                    ->update(['user_notified_at' => now()]);
-            }
+            // Don't mark posts as notified here - let classification handle notifications
             
             Log::info("IonQ scraping completed. Scraped {$scrapedCount} posts, {$newPostsCount} new.");
             

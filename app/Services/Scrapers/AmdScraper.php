@@ -215,7 +215,7 @@ class AmdScraper
                 'url' => $postData['url'],
                 'published_at' => $postData['published_at'],
                 'company_id' => $postData['company_id'],
-                'user_notified_at' => now(), // Mark as notified since we're processing it
+                // Don't mark as notified here - let classification handle notifications
             ]);
 
             Log::info("AMD post saved: {$post->title}");
