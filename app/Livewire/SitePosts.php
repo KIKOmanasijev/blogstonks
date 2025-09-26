@@ -20,7 +20,8 @@ class SitePosts extends Component
         $this->isFollowed = $company->isFollowedBy(Auth::user());
         $this->loadPosts();
         
-        // Load stock price data
+        // Load additional data
+        $this->company->posts_count = $company->posts()->count();
         $this->company->latest_stock_price = $company->getLatestStockPrice();
         $this->company->latest_blog_score = $company->getLatestBlogScoreWithStatus();
     }

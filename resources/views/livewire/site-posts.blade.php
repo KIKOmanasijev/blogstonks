@@ -1,57 +1,67 @@
 <div>
-    <div class="space-y-6">
-        <!-- Company Header Card -->
-        <div class="bg-white shadow rounded-lg overflow-hidden">
-            <div class="px-6 py-8">
-                <div class="flex items-start justify-between">
+    <!-- Green Header Section -->
+    <div class="relative bg-gradient-to-r from-green-600 to-green-700 text-white overflow-hidden pt-16">
+        <!-- Low-opacity shapes -->
+        <div class="absolute inset-0">
+            <div class="absolute top-0 left-0 w-64 h-64 bg-white opacity-10 rounded-full -translate-x-32 -translate-y-32"></div>
+            <div class="absolute top-0 right-0 w-48 h-48 bg-white opacity-10 rounded-full translate-x-24 -translate-y-24"></div>
+            <div class="absolute bottom-0 left-1/4 w-32 h-32 bg-white opacity-10 rounded-full translate-y-16"></div>
+            <div class="absolute bottom-0 right-1/3 w-40 h-40 bg-white opacity-10 rounded-full translate-y-20"></div>
+        </div>
+        
+        <div class="relative z-10 py-8">
+            <div class="container mx-auto px-6">
+                <div class="flex justify-between items-center">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 h-16 w-16">
                             @if($company->favicon_url)
                                 <img src="{{ $company->favicon_url }}" alt="{{ $company->name }}" class="h-16 w-16 rounded-full object-cover">
                             @else
-                                <div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
-                                    <span class="text-2xl font-medium text-blue-600">
+                                <div class="h-16 w-16 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
+                                    <span class="text-2xl font-medium text-white">
                                         {{ strtoupper(substr($company->name, 0, 2)) }}
                                     </span>
                                 </div>
                             @endif
                         </div>
                         <div class="ml-6">
-                            <h1 class="text-3xl font-bold text-gray-900">{{ $company->name }}</h1>
-                            <p class="mt-1 text-lg text-gray-600">Latest News & Updates</p>
+                            <h1 class="text-3xl font-bold">{{ $company->name }}</h1>
+                            <p class="mt-1 text-lg text-green-100">Latest News & Updates</p>
                             <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <p class="text-sm text-gray-500">Website</p>
-                                    <a href="{{ $company->url }}" target="_blank" class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                                    <p class="text-sm text-green-200">Website</p>
+                                    <a href="{{ $company->url }}" target="_blank" class="text-sm text-white hover:text-green-100 underline">
                                         {{ $company->url }}
                                     </a>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-500">Ticker</p>
-                                    <p class="text-sm font-medium text-gray-900">
-                                        {{ $company->ticker ?? 'N/A' }}
-                                    </p>
+                                    <p class="text-sm text-green-200">Ticker</p>
+                                    <p class="text-sm text-white">{{ $company->ticker ?? 'N/A' }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-500">Posts</p>
-                                    <p class="text-sm font-medium text-gray-900">{{ $company->posts()->count() }}</p>
+                                    <p class="text-sm text-green-200">Posts</p>
+                                    <p class="text-sm text-white">{{ $company->posts_count }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-3">
-                        <button wire:click="toggleFollow" 
-                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white {{ $isFollowed ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700' }}">
-                            {{ $isFollowed ? '- Unfollow' : '+ Follow' }}
+                    <div class="flex space-x-3">
+                        <button wire:click="toggleFollow({{ $company->id }})" 
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-green-600 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            {{ $company->is_followed ? '- Unfollow' : '+ Follow' }}
                         </button>
-                        <a href="{{ route('dashboard') }}"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        <a href="{{ route('dashboard') }}" 
+                            class="inline-flex items-center px-4 py-2 border border-white border-opacity-30 rounded-md shadow-sm text-sm font-medium text-white bg-transparent hover:bg-white hover:bg-opacity-10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white">
                             Back to Dashboard
                         </a>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="space-y-6">
+        <div class="container mx-auto px-6 py-6">
 
         @if(session('message'))
             <div class="rounded-md bg-green-50 p-4">
@@ -68,7 +78,7 @@
             </div>
         @endif
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
             <!-- News Section -->
             <div class="lg:col-span-2">
                 <div class="flex items-center justify-between mb-6">
@@ -298,6 +308,7 @@
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 </div>
