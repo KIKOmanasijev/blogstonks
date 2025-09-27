@@ -9,7 +9,7 @@
     <flux:header container class="absolute top-0 left-0 right-0 z-50 border-b border-transparent bg-transparent">
         <flux:sidebar.toggle class="lg:hidden text-white" icon="bars-2" inset="left" />
 
-        <a href="{{ route('dashboard') }}" class="ms-2 me-5 flex items-center space-x-2 rtl:space-x-reverse lg:ms-0 text-white" wire:navigate>
+        <a href="{{ route('dashboard') }}" class="ms-2 flex items-center space-x-2 rtl:space-x-reverse lg:ms-0 text-white" wire:navigate>
             <x-app-logo />
         </a>
 
