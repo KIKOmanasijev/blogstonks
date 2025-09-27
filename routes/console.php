@@ -16,4 +16,6 @@ Schedule::command('scrape:blogs')
     ->weekends();
 
 // Schedule stock price fetching every 30 seconds
-Schedule::command('stocks:fetch')->everyThirtySeconds();
+Schedule::command('stocks:fetch')
+    ->everyThirtySeconds()
+    ->weekdays();
