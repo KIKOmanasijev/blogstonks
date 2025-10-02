@@ -43,19 +43,44 @@ class Dashboard extends Component
     {
         $user = Auth::user();
         
-        // Ultra-minimal approach to isolate memory issue
+        // Get companies with optimized Eloquent queries (1-2 queries total)
         $companies = $user->followedCompanies()
             ->where('is_active', true)
-            ->select(['id', 'name', 'ticker', 'favicon_url']) // Only select needed fields
-            ->limit(10) // Limit to 10 companies max
+            ->withCount('posts')
+            ->with([
+                'stockPrices' => function($query) {
+                    $query->latest('price_at')->limit(1);
+                },
+                'posts' => function($query) {
+                    $query->latest('published_at')->limit(1);
+                }
+            ])
             ->get()
-            ->map(function ($company) {
-                $company->new_posts_count = 0;
-                $company->latest_stock_price = null;
-                $company->latest_blog_score = null;
-                $company->last_post_at = null;
+            ->map(function ($company) use ($user) {
+                // Calculate new posts count efficiently
+                $company->new_posts_count = $company->getNewPostsCountForUser($user);
+                
+                // Get latest stock price from preloaded relationship
+                $company->latest_stock_price = $company->stockPrices->first();
+                
+                // Get latest blog score from preloaded post
+                $latestPost = $company->posts->first();
+                if ($latestPost && $latestPost->importance_score !== null) {
+                    $isHuge = $latestPost->is_huge_news && $latestPost->published_at->diffInHours(now()) <= 12;
+                    $company->latest_blog_score = [
+                        'score' => $latestPost->importance_score,
+                        'is_huge' => $isHuge,
+                        'scored_at' => $latestPost->scored_at,
+                        'post_title' => $latestPost->title,
+                    ];
+                } else {
+                    $company->latest_blog_score = null;
+                }
+                
+                $company->last_post_at = $latestPost?->published_at;
                 return $company;
-            });
+            })
+            ->sortByDesc('last_post_at');
 
         return view('livewire.dashboard', [
             'companies' => $companies,
