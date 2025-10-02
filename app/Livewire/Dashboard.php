@@ -55,8 +55,9 @@ class Dashboard extends Component
                 }
             ])
             ->get()
-            ->map(function ($company) use ($user) {
-                $company->new_posts_count = $company->getNewPostsCountForUser($user);
+            ->map(function ($company) {
+                // Temporarily disable new posts count to fix memory issue
+                $company->new_posts_count = 0;
                 $company->latest_stock_price = $company->stockPrices->first();
                 
                 // Get latest blog score from already loaded post
