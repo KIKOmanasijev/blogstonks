@@ -40,16 +40,40 @@ class Dashboard extends Component
 
     public function render()
     {
-        $companies = Auth::user()->followedCompanies()
+        $user = Auth::user();
+        
+        // Get companies with optimized queries to avoid N+1 problems
+        $companies = $user->followedCompanies()
             ->where('is_active', true)
             ->withCount('posts')
-            ->with('stockPrices')
+            ->with([
+                'stockPrices' => function($query) {
+                    $query->latest('price_at')->limit(1);
+                },
+                'posts' => function($query) {
+                    $query->latest('published_at')->limit(1);
+                }
+            ])
             ->get()
-            ->map(function ($company) {
-                $company->new_posts_count = $company->getNewPostsCountForUser(Auth::user());
-                $company->latest_stock_price = $company->getLatestStockPrice();
-                $company->latest_blog_score = $company->getLatestBlogScoreWithStatus();
-                $company->last_post_at = $company->posts()->latest('published_at')->first()?->published_at;
+            ->map(function ($company) use ($user) {
+                $company->new_posts_count = $company->getNewPostsCountForUser($user);
+                $company->latest_stock_price = $company->stockPrices->first();
+                
+                // Get latest blog score from already loaded post
+                $latestPost = $company->posts->first();
+                if ($latestPost && $latestPost->importance_score !== null) {
+                    $isHuge = $latestPost->is_huge_news && $latestPost->published_at->diffInHours(now()) <= 12;
+                    $company->latest_blog_score = [
+                        'score' => $latestPost->importance_score,
+                        'is_huge' => $isHuge,
+                        'scored_at' => $latestPost->scored_at,
+                        'post_title' => $latestPost->title,
+                    ];
+                } else {
+                    $company->latest_blog_score = null;
+                }
+                
+                $company->last_post_at = $latestPost?->published_at;
                 return $company;
             })
             ->sortByDesc('last_post_at');
