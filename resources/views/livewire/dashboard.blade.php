@@ -202,11 +202,8 @@
                                 
                                 <!-- Last Post At -->
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    @php
-                                        $lastPost = $company->posts()->latest('published_at')->first();
-                                    @endphp
-                                    @if($lastPost)
-                                        {{ $lastPost->published_at->diffForHumans() }}
+                                    @if($company->last_post_at)
+                                        {{ $company->last_post_at->diffForHumans() }}
                                     @else
                                         No posts
                                     @endif
